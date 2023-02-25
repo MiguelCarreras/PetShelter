@@ -3,9 +3,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { solid } from '@fortawesome/fontawesome-svg-core/import.macro' // <-- import styles to be used
-
-
+import io from 'socket.io-client';
+    
 const PetList = () => {
+    const socket = io.connect('192.168.0.7:8000');
+
     const navigate = useNavigate();
     const [pets, setPets] = useState([]);
 
@@ -18,7 +20,10 @@ const PetList = () => {
 
     useEffect(() => {
         getPets();
-    }, [])
+        socket.on('pet-was-added', (pet) => {
+            setPets([...pets, pet]);
+        });
+    }, [pets]);
 
     return (
         <>

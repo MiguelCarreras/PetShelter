@@ -10,15 +10,6 @@ const PetShow = () => {
     const [pet, setPet] = useState({});
     const navigate = useNavigate();
 
-    const getPet = async () => {
-        await axios.get(`${process.env.REACT_APP_API_URL}/pet/${id}`)
-            .then((response) => {
-                setPet(response.data);
-                console.log(pet);
-            }).catch(e => console.log(e));
-
-    }
-
     const adoptPet = async () => {
         await axios.put(`${process.env.REACT_APP_API_URL}/pet/${id}`, { wasAdopted: true })
             .then((response) => {
@@ -27,8 +18,16 @@ const PetShow = () => {
     }
 
     useEffect(() => {
+        const getPet = async () => {
+            await axios.get(`${process.env.REACT_APP_API_URL}/pet/${id}`)
+                .then((response) => {
+                    setPet(response.data);
+                    console.log(pet);
+                }).catch(e => console.log(e));
+    
+        }
         getPet();
-    }, [])
+    }, [id, pet]);
 
     return (
         <>

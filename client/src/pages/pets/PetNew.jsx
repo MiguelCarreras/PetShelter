@@ -4,8 +4,11 @@ import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { solid } from '@fortawesome/fontawesome-svg-core/import.macro';
+import io from 'socket.io-client';
 
 const PetNew = () => {
+    const socket = io.connect('192.168.0.7:8000');
+
     const navigate = useNavigate();
 
     const initialValues = {
@@ -19,7 +22,10 @@ const PetNew = () => {
 
     const createPet = async (requestParams) => {
         await axios.post(`${process.env.REACT_APP_API_URL}/pet`, requestParams)
-            .then(navigate('/'))
+            .then((response) => {
+                socket.emit('add-pet', response.data);
+                navigate('/')
+            })
             .catch(e => {
                 console.log(e);
             })
