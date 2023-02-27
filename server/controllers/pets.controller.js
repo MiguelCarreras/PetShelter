@@ -9,11 +9,7 @@ module.exports.index = (request, response) => {
 
 module.exports.getAll = async (request, response) => {
     try {
-        const pets = await Pet.find({
-            $where: function () {
-                return !this.wasAdopted;
-            }
-        });
+        const pets = await Pet.find({});
         response.json(pets)
     } catch (error) {
         console.log(error);
@@ -58,6 +54,17 @@ module.exports.update = async (request, response) => {
         const params = request.body;
         const pet = await Pet.findOneAndUpdate({ _id: request.params.id }, params, { new: true });
         response.json(pet);
+    } catch (error) {
+        response.status(400);
+        response.json(error);
+    }
+}
+
+module.exports.delete = async (request, response) => {
+    try {
+        await Pet.deleteOne({ _id: request.params.id });
+        response.status(200);
+        response.json({_id: request.params.id });
     } catch (error) {
         response.status(400);
         response.json(error);
