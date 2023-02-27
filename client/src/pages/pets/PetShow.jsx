@@ -3,18 +3,21 @@ import { Link, useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { solid, regular } from '@fortawesome/fontawesome-svg-core/import.macro';
+import { io } from 'socket.io-client';
 
 const PetShow = () => {
-
     const { id } = useParams();
     const [pet, setPet] = useState({});
+    const [socket, setSocket] = useState();
+
     const navigate = useNavigate();
 
     const adoptPet = async () => {
-        await axios.put(`${process.env.REACT_APP_API_URL}/pet/${id}`, { wasAdopted: true })
-            .then((response) => {
-                navigate('/');
-            }).catch(e => console.log(e));
+        await axios.delete(`${process.env.REACT_APP_API_URL}/pet/${id}`)
+        .then((response) => {
+            socket.emit('pet-adopt', response.data);
+            navigate('/');
+        }).catch(e => console.log(e));
     }
 
     useEffect(() => {
@@ -22,12 +25,19 @@ const PetShow = () => {
             await axios.get(`${process.env.REACT_APP_API_URL}/pet/${id}`)
                 .then((response) => {
                     setPet(response.data);
-                    console.log(pet);
                 }).catch(e => console.log(e));
     
         }
         getPet();
-    }, [id, pet]);
+    }, [id]);
+
+    useEffect(() => {
+        const newSocket = io.connect('192.168.0.7:8000');
+        setSocket(newSocket);
+        return () => {
+            newSocket.disconnect();
+        };
+    }, []);
 
     return (
         <>

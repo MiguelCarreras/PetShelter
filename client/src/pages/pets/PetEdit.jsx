@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import PageHeader from '../../layouts/PageHeader';
 import PetForm from '../../components/PetForm';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { solid } from '@fortawesome/fontawesome-svg-core/import.macro';
+import { io } from 'socket.io-client';
 
 const PetEdit = () => {
 
     const { id } = useParams();
     const [initialValues, setInitialValues] = useState({});
+    const [socket, setSocket] = useState();
     const navigate = useNavigate();
 
     const getPet = async () => {
@@ -22,13 +23,23 @@ const PetEdit = () => {
     const updatePet = async (params) => {
         await axios.put(`${process.env.REACT_APP_API_URL}/pet/${id}`, params)
         .then((response) => {
+            debugger;
+            socket.emit('pet-update', response.data);
             navigate('/');
         }).catch(e => console.log(e));
     }
 
     useEffect(() => {
         getPet();
-    }, [])
+    });
+
+    useEffect(() => {
+        const newSocket = io.connect('192.168.0.7:8000');
+        setSocket(newSocket);
+        return () => {
+            newSocket.disconnect();
+        };
+    }, []);
 
     return (
         <>

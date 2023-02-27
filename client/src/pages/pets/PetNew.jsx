@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import PetForm from '../../components/PetForm';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
@@ -7,9 +7,9 @@ import { solid } from '@fortawesome/fontawesome-svg-core/import.macro';
 import io from 'socket.io-client';
 
 const PetNew = () => {
-    const socket = io.connect('192.168.0.7:8000');
-
     const navigate = useNavigate();
+
+    const [socket, setSocket] = useState();
 
     const initialValues = {
         name: '',
@@ -23,13 +23,21 @@ const PetNew = () => {
     const createPet = async (requestParams) => {
         await axios.post(`${process.env.REACT_APP_API_URL}/pet`, requestParams)
             .then((response) => {
-                socket.emit('add-pet', response.data);
-                navigate('/')
+                socket.emit('create-pet', response.data);
+                navigate('/');
             })
             .catch(e => {
                 console.log(e);
             })
     };
+
+    useEffect(() => {
+        const newSocket = io.connect('192.168.0.7:8000');
+        setSocket(newSocket);
+        return () => {
+            newSocket.disconnect();
+        };
+    }, []);
 
     return (
         <>

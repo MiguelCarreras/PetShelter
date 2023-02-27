@@ -6,12 +6,11 @@ import { solid } from '@fortawesome/fontawesome-svg-core/import.macro' // <-- im
 import io from 'socket.io-client';
     
 const PetList = () => {
-    const socket = io.connect('192.168.0.7:8000');
-
     const navigate = useNavigate();
     const [pets, setPets] = useState([]);
 
     const getPets = async () => {
+        console.log('getPets')
         await axios.get(`${process.env.REACT_APP_API_URL}/pets`)
             .then((response) => {
                 setPets(response.data);
@@ -20,9 +19,31 @@ const PetList = () => {
 
     useEffect(() => {
         getPets();
-        socket.on('pet-was-added', (pet) => {
+    }, []);
+
+    useEffect(() => {
+        const socket = io.connect('192.168.0.7:8000');
+        socket.on('pet-created', (pet) => {
             setPets([...pets, pet]);
         });
+
+        socket.on('pet-updated', (petUpdated) => {
+            debugger;
+            const updatedPets = pets.map((pet, index) => {
+               return pet._id === petUpdated._id ? petUpdated : pet;
+            });
+            setPets(updatedPets);
+        });
+
+        socket.on('pet-adopted', (petAdopted) => {
+            setPets(pets.filter(pet => 
+                pet._id !== petAdopted._id
+            ));
+        });
+
+        return () => {
+            socket.disconnect();
+        };
     }, [pets]);
 
     return (
