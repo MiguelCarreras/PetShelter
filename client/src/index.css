@@ -14,6 +14,10 @@ body {
   padding-right: 15px;
 }
 
+.page-header-icon:hover, .page-header-title:hover {
+  cursor:  pointer !important;
+}
+
 .page-link {
   font-size: 18px !important;
   text-decoration: none;
