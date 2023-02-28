@@ -70,3 +70,15 @@ module.exports.delete = async (request, response) => {
         response.json(error);
     }
 }
+
+module.exports.like = async (request, response) => {
+    try {
+        const pet = await Pet.findOne({ _id: request.params.id });
+        const likedPet = await Pet.findOneAndUpdate({_id: request.params.id}, {likes: pet.likes + 1}, { new: true });
+        response.status(200);
+        response.json(likedPet);
+    } catch (error) {
+        response.status(400);
+        response.json(error);
+    }
+}

@@ -33,6 +33,10 @@ io.on('connection', (socket) => {
         socket.broadcast.emit('pet-adopted', pet);
     });
 
+    socket.on('pet-like', (pet) => {
+        socket.broadcast.emit('pet-liked', pet);
+    });
+
     socket.on('disconnect', () => {
         console.log(`socket ${socket.id} disconnected`);
     });
