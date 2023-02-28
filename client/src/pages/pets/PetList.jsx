@@ -4,10 +4,11 @@ import axios from 'axios';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { solid } from '@fortawesome/fontawesome-svg-core/import.macro' // <-- import styles to be used
 import io from 'socket.io-client';
-    
+
 const PetList = () => {
     const navigate = useNavigate();
     const [pets, setPets] = useState([]);
+    const thereArePets = pets.length !== 0;
 
     const getPets = async () => {
         console.log('getPets')
@@ -28,15 +29,14 @@ const PetList = () => {
         });
 
         socket.on('pet-updated', (petUpdated) => {
-            debugger;
             const updatedPets = pets.map((pet, index) => {
-               return pet._id === petUpdated._id ? petUpdated : pet;
+                return pet._id === petUpdated._id ? petUpdated : pet;
             });
             setPets(updatedPets);
         });
 
         socket.on('pet-adopted', (petAdopted) => {
-            setPets(pets.filter(pet => 
+            setPets(pets.filter(pet =>
                 pet._id !== petAdopted._id
             ));
         });
@@ -45,6 +45,24 @@ const PetList = () => {
             socket.disconnect();
         };
     }, [pets]);
+
+
+    let tBodyContent;
+    if (thereArePets) {
+        tBodyContent = pets.map((pet, index) => <tr key={pet._id} onClick={() => navigate(`/pets/${pet._id}`)}>
+            <td>{pet.name}</td>
+            <td>{pet.type}</td>
+            <td onClick={(e) => e.stopPropagation()} className="text-center">
+                <Link to={`/pets/${pet._id}/edit`} title='Edit'><FontAwesomeIcon icon={solid('pen-to-square')} /></Link>
+            </td>
+        </tr>)
+    } else {
+        tBodyContent = <tr>
+            <td colSpan={3} >
+                There aren't pets looking for a good home!!
+            </td>
+        </tr>
+    }
 
     return (
         <>
@@ -55,7 +73,7 @@ const PetList = () => {
                 <div className='col-md-2'>
                     <Link to={'/pets/new'} className='page-link  '><FontAwesomeIcon icon={solid('clipboard')} /> Add Pet</Link>
                 </div>
-                <div className='table-responsive card'>
+                <div className={`table-responsive card ${ thereArePets ? 'table-scroll' : ''}`}>
                     <table className='table table-hover table-borderedless'>
                         <thead>
                             <tr>
@@ -65,13 +83,7 @@ const PetList = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {pets.map((pet, index) => <tr key={pet._id} onClick={() => navigate(`/pets/${pet._id}`)}>
-                                <td>{pet.name}</td>
-                                <td>{pet.type}</td>
-                                <td onClick={(e) => e.stopPropagation() } className="text-center">
-                                    <Link to={`/pets/${pet._id}/edit`} title='Edit'><FontAwesomeIcon icon={solid('pen-to-square')} /></Link>
-                                </td>
-                            </tr>)}
+                            { tBodyContent }
                         </tbody>
                     </table>
                 </div>
