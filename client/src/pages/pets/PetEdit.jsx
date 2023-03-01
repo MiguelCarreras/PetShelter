@@ -36,7 +36,7 @@ const PetEdit = () => {
 
     // DidMount and didUnMount
     useEffect(() => {
-        const newSocket = io.connect(`${process.env.DOMAIN}`);
+        const newSocket = io.connect(`${process.env.REACT_APP_SOCKET_URL}`);
         setSocket(newSocket);
         return () => {
             newSocket.disconnect();

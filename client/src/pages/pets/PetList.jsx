@@ -26,7 +26,7 @@ const PetList = () => {
 
     // DidMount, DidUpdate(Only when change pets state) and WillUnmount
     useEffect(() => {
-        const socket = io.connect(`${process.env.DOMAIN}`);
+        const socket = io.connect(`${process.env.REACT_APP_SOCKET_URL}`);
         socket.on('pet-created', (pet) => {
             setPets([...pets, pet]);
         });

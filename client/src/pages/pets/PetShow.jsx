@@ -45,7 +45,7 @@ const PetShow = () => {
 
     // DidMount and WillUnMount
     useEffect(() => {
-        const newSocket = io.connect(`${process.env.DOMAIN}`);
+        const newSocket = io.connect(`${process.env.REACT_APP_SOCKET_URL}`);
         newSocket.on('pet-liked', (pet) => {
             setPet(pet);
         });
