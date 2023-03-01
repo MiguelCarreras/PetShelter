@@ -31,8 +31,9 @@ const PetNew = () => {
             })
     };
 
+    // DidMount and WillUnMount
     useEffect(() => {
-        const newSocket = io.connect('192.168.0.7:8000');
+        const newSocket = io.connect(`${process.env.DOMAIN}`);
         setSocket(newSocket);
         return () => {
             newSocket.disconnect();
@@ -46,7 +47,10 @@ const PetNew = () => {
                     <span className='page-subtitle'>Know a pet needing a home?</span>
                 </div>
                 <div className='col-md-2'>
-                    <Link to={'/'} className='page-link  '><FontAwesomeIcon icon={solid('house')} /> Home</Link>
+                    <Link to={'/'} 
+                          className='page-link'>
+                            <FontAwesomeIcon icon={solid('house')} /> Home
+                    </Link>
                 </div>
                 <div className='col-md-12'>
                     <PetForm

@@ -7,23 +7,26 @@ import io from 'socket.io-client';
 
 const PetList = () => {
     const navigate = useNavigate();
+
     const [pets, setPets] = useState([]);
+
     const thereArePets = pets.length !== 0;
 
     const getPets = async () => {
-        console.log('getPets')
         await axios.get(`${process.env.REACT_APP_API_URL}/pets`)
             .then((response) => {
                 setPets(response.data);
             }).catch(e => console.log(e));
     }
 
+    // Only didMount
     useEffect(() => {
         getPets();
     }, []);
 
+    // DidMount, DidUpdate(Only when change pets state) and WillUnmount
     useEffect(() => {
-        const socket = io.connect('192.168.0.7:8000');
+        const socket = io.connect(`${process.env.DOMAIN}`);
         socket.on('pet-created', (pet) => {
             setPets([...pets, pet]);
         });
@@ -46,14 +49,18 @@ const PetList = () => {
         };
     }, [pets]);
 
-
+    // Table body content according pets quantity
     let tBodyContent;
     if (thereArePets) {
-        tBodyContent = pets.map((pet, index) => <tr key={pet._id} onClick={() => navigate(`/pets/${pet._id}`)}>
+        tBodyContent = pets.map((pet, index) => <tr key={pet._id}
+            onClick={() => navigate(`/pets/${pet._id}`)}>
             <td>{pet.name}</td>
             <td>{pet.type}</td>
-            <td onClick={(e) => e.stopPropagation()} className="text-center">
-                <Link to={`/pets/${pet._id}/edit`} title='Edit'><FontAwesomeIcon icon={solid('pen-to-square')} /></Link>
+            <td onClick={(e) => e.stopPropagation()}
+                className="text-center">
+                <Link to={`/pets/${pet._id}/edit`} title='Edit'>
+                    <FontAwesomeIcon icon={solid('pen-to-square')} />
+                </Link>
             </td>
         </tr>)
     } else {
@@ -71,9 +78,12 @@ const PetList = () => {
                     <span className='page-subtitle'>These pets are looking for a good home</span>
                 </div>
                 <div className='col-md-2'>
-                    <Link to={'/pets/new'} className='page-link  '><FontAwesomeIcon icon={solid('clipboard')} /> Add Pet</Link>
+                    <Link to={'/pets/new'}
+                        className='page-link'>
+                        <FontAwesomeIcon icon={solid('clipboard')} /> Add Pet
+                    </Link>
                 </div>
-                <div className={`table-responsive card ${ thereArePets ? 'table-scroll' : ''}`}>
+                <div className={`table-responsive card ${thereArePets ? 'table-scroll' : ''}`}>
                     <table className='table table-hover table-borderedless'>
                         <thead>
                             <tr>
@@ -83,7 +93,7 @@ const PetList = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            { tBodyContent }
+                            {tBodyContent}
                         </tbody>
                     </table>
                 </div>

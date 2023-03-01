@@ -6,12 +6,14 @@ import { solid, regular } from '@fortawesome/fontawesome-svg-core/import.macro';
 import { io } from 'socket.io-client';
 
 const PetShow = () => {
+
     const { id } = useParams();
+    
+    const navigate = useNavigate();
+
     const [pet, setPet] = useState({});
     const [wasLiked, setWasLiked] = useState(false);
     const [socket, setSocket] = useState();
-
-    const navigate = useNavigate();
 
     const adoptPet = async () => {
         await axios.delete(`${process.env.REACT_APP_API_URL}/pet/${id}`)
@@ -30,19 +32,20 @@ const PetShow = () => {
             }).catch(e => console.log(e));
     }
 
+    // DidMount and didUpdate(only when change id)
     useEffect(() => {
         const getPet = async () => {
             await axios.get(`${process.env.REACT_APP_API_URL}/pet/${id}`)
                 .then((response) => {
                     setPet(response.data);
                 }).catch(e => console.log(e));
-
         }
         getPet();
     }, [id]);
 
+    // DidMount and WillUnMount
     useEffect(() => {
-        const newSocket = io.connect('192.168.0.7:8000');
+        const newSocket = io.connect(`${process.env.DOMAIN}`);
         newSocket.on('pet-liked', (pet) => {
             setPet(pet);
         });
@@ -59,12 +62,19 @@ const PetShow = () => {
                     <span className='page-subtitle'>Details about: {pet.name}</span>
                 </div>
                 <div className='col-md-3 row'>
-
                     <div className='col-md-6'>
-                        <button type='button' className='btn btn-outline-danger' onClick={adoptPet} title='Adopt'><FontAwesomeIcon icon={regular('heart')} /> {pet.name}</button>
+                        <button type='button' 
+                                className='btn btn-outline-danger' 
+                                onClick={adoptPet} 
+                                title='Adopt'>
+                            <FontAwesomeIcon icon={regular('heart')} /> {pet.name}
+                        </button>
                     </div>
                     <div className='col-md-6'>
-                        <Link to={'/'} className='page-link'><FontAwesomeIcon icon={solid('house')} /> Home</Link>
+                        <Link to={'/'} 
+                              className='page-link'>
+                            <FontAwesomeIcon icon={solid('house')} /> Home
+                        </Link>
                     </div>
                 </div>
             </div>
@@ -95,12 +105,14 @@ const PetShow = () => {
                         <div className='row text-center pt-5'>
                             <div className='col-md-12'>
                                 <button type='button'
-                                    className='btn btn-success'
-                                    onClick={likePet}
-                                    disabled={wasLiked}>
+                                        className='btn btn-success'
+                                        onClick={likePet}
+                                        disabled={wasLiked}>
                                     <FontAwesomeIcon icon={solid('thumbs-up')} /> Like {pet.name}
                                 </button>
-                                <span className='d-inline-block' style={{ marginLeft: '5px' }}>{pet.likes} like(s)</span>
+                                <span className='d-inline-block' 
+                                      style={{ marginLeft: '5px' }}>{pet.likes} like(s)
+                                </span>
                             </div>
                         </div>
                     </div>

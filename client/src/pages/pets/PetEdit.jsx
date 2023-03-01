@@ -7,12 +7,13 @@ import { solid } from '@fortawesome/fontawesome-svg-core/import.macro';
 import { io } from 'socket.io-client';
 
 const PetEdit = () => {
-
-    const { id } = useParams();
-    const [initialValues, setInitialValues] = useState({});
-    const [socket, setSocket] = useState();
     const navigate = useNavigate();
 
+    const { id } = useParams();
+    
+    const [initialValues, setInitialValues] = useState({});
+    const [socket, setSocket] = useState();
+    
     const getPet = async () => {
         await axios.get(`${process.env.REACT_APP_API_URL}/pet/${id}`)
         .then((response) => {
@@ -23,18 +24,19 @@ const PetEdit = () => {
     const updatePet = async (params) => {
         await axios.put(`${process.env.REACT_APP_API_URL}/pet/${id}`, params)
         .then((response) => {
-            debugger;
             socket.emit('pet-update', response.data);
             navigate('/');
         }).catch(e => console.log(e));
     }
 
+    // DidMount and didUpdate
     useEffect(() => {
         getPet();
     });
 
+    // DidMount and didUnMount
     useEffect(() => {
-        const newSocket = io.connect('192.168.0.7:8000');
+        const newSocket = io.connect(`${process.env.DOMAIN}`);
         setSocket(newSocket);
         return () => {
             newSocket.disconnect();
@@ -48,7 +50,9 @@ const PetEdit = () => {
                     <span className='page-subtitle'>Edit {initialValues.name}</span>
                 </div>
                 <div className='col-md-2'>
-                    <Link to={'/'} className='page-link  '><FontAwesomeIcon icon={solid('house')} /> Home</Link>
+                    <Link to={'/'} className='page-link'>
+                        <FontAwesomeIcon icon={solid('house')} /> Home
+                    </Link>
                 </div>
                 <div className='col-md-12'>
                     <PetForm

@@ -2,7 +2,8 @@ import React from 'react';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as yup from 'yup';
 
-const PetForm = ({ initialValues, funcAction, newPet=false }) => {
+const PetForm = ({ initialValues, funcAction, newPet = false }) => {
+    
     const petSchema = yup.object().shape({
         name: yup.string().min(3, 'Must have at least 3 characters.')
             .required('Required.'),
@@ -27,8 +28,7 @@ const PetForm = ({ initialValues, funcAction, newPet=false }) => {
                         enableReinitialize={true}
                         initialValues={initialValues}
                         validationSchema={petSchema}
-                        onSubmit={handleSubmit}
-                    >
+                        onSubmit={handleSubmit} >
                         {({
                             values,
                             errors,
